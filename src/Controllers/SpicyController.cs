@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dotnetos.Controllers
@@ -7,6 +8,7 @@ namespace Dotnetos.Controllers
     public class SpicyController : ControllerBase
     {
         [HttpGet]
+        [Authorize]
         public string Get()
         {
             return "Hot!";

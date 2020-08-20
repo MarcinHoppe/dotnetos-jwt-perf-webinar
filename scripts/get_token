@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+  echo "Usage: ./get_token <CLIENT_SECRET>"
+
+  exit 1
+fi
+
+resp=$(curl --request POST \
+  --silent \
+  --url https://marcin-auth0.auth0.com/oauth/token \
+  --header 'content-type: application/json' \
+  --data "{\"client_id\":\"BCFsS07Y6qpF2X8QSgcrCuKL4jsreFBM\",\"client_secret\":\"$1\",\"audience\":\"https://dotnetos.org\",\"grant_type\":\"client_credentials\"}")
+
+echo $resp | jq -r ".access_token"
+
+exit 0

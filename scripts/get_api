@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+if [ -z "$1" ]; then
+
+  curl --request GET \
+    --silent \
+    --url https://localhost:5001/Spicy \
+    --header 'content-type: application/json' \
+    -i -w '\n'
+
+else
+
+  curl --request GET \
+    --silent \
+    --url https://localhost:5001/Spicy \
+    --header 'content-type: application/json' \
+    --header "Authorization: Bearer $1" \
+    -i -w '\n'
+    
+fi
