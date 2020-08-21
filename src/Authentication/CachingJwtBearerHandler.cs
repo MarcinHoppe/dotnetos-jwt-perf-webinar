@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
-namespace Dotnetos.Utils
+namespace Dotnetos.Authentication
 {
     class CachingJwtBearerHandler : JwtBearerHandler
     {
@@ -37,7 +37,7 @@ namespace Dotnetos.Utils
             
             if (authResult.Succeeded)
             {
-                memoryCache.Set(Context.Request.Headers["Authorization"], authResult);
+                memoryCache.Set(Request.Headers[HeaderNames.Authorization], authResult);
             }
 
             return authResult;

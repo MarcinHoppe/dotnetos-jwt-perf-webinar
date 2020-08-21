@@ -1,4 +1,4 @@
-using Dotnetos.Utils;
+using Dotnetos.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

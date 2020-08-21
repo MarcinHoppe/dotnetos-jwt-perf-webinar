@@ -1,13 +1,13 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dotnetos.Utils
+namespace Dotnetos.Diagnostics
 {
-    class TracingHandler : DelegatingHandler
+    class TracingHttpClientHandler : DelegatingHandler
     {
-        public TracingHandler() : base(new HttpClientHandler())
+        public TracingHttpClientHandler() : base(new HttpClientHandler())
         {
         }
 
