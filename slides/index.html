@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Improving JWT performance in ASP.NET Core</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="_General/Slides/style.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+layout: true
+<div class="footer">Dotnetos - <a href="https://asyncexpert.com">asyncexpert.com</a></div>
+
+---
+
+class: center, middle
+
+# Improving JWT performance in ASP.NET Core
+
+---
+## Agenda
+
+- API Security and JSON Web Tokens (JWT)
+- Using JWT in ASP.NET Core
+- Sync or async?
+- Caching! Caching! Caching!
+
+---
+## API Security
+
+- Client wants to call API
+- API needs to authenticate the client
+- Introduce a trusted third party
+  - Identity provider (IdP)
+  - Typical suspects: Auth0, Azure AD, Identity Server
+- Client obtains a token from the IdP
+- Client calls the API with the token
+- API verifies the token
+  - *This is our focus for today*
+- Two dominant protocols
+  - OAuth 2.0
+  - OpenID Connect
+
+---
+## OpenID Connect
+
+### TODO: Grafika
+
+---
+## JSON Web Tokens (JWT)
+
+- Pronunciation: _jot_ ([RFC 7519](https://tools.ietf.org/html/rfc7519))
+- Token is a set of claims
+  - Issuer
+  - Audience
+  - Subject
+  - Other: expiration, issued at, etc.
+- Format
+  - JSON
+    - Header
+    - Payload
+  - Signature or MAC code
+  - Base64url encoding
+  - Concatenated by "."
+- JWE: ensure confidentiality
+- JWS: ensure integrity and non-repudiation
+  - HMAC: shared secrets
+  - Signatures: public key cryptography (RSA, etc.)
+  - *Dominant use case*
+
+---
+## Sample JWT
+
+```
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1qVkZORU5DT1RJeFF6ZEZPRE5CUVVSR1JURTFPVGc0UXpnMlEwTkJRamd5TkRZMk1qSTBNUSJ9
+.
+eyJpc3MiOiJodHRwczovL21hcmNpbi1hdXRoMC5hdXRoMC5jb20vIiwic3ViIjoiQkNGc1MwN1k2cXBGMlg4UVNnY3JDdUtMNGpzcmVGQk1AY2xpZW50cyIs
+ImF1ZCI6Imh0dHBzOi8vZG90bmV0b3Mub3JnIiwiaWF0IjoxNTk4MDAyNzgwLCJleHAiOjE1OTgwODkxODAsImF6cCI6IkJDRnNTMDdZNnFwRjJYOFFTZ2Ny
+Q3VLTDRqc3JlRkJNIiwiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIn0
+.
+yZm6Ihz_Xz0bDwaty88addYLFF_7KeX-NX26Fyul23naX0B5ljYxtA8vlVYWJkeURsOxLJMuRwDqKQbiZQJcReL2Eomwl7lKUqne1qbJb-KO9UQbtFWkyJs7
+GcORtsK0avNJHexn0fcYCnf9j1Ley2mxz2K24PMwefmcVuwiXzQd9VpjvE6yPGruU2ByerptMM5m4oGS2nW9K-5kETvSbXjXCNrvh4qu2Zdjhgn0nvKXhYjz
+9PiZUUDWp83s0LqiT-yDOVMdrTeumHvoaW1Wvu7x6wTUZEJgP9fzsnLfEQJthtDGkt_e85dybsWUqX9kB8SfLpB1H3Z0_UZWbSrVBQ
+```
+
+---
+## Key Management
+
+- OAuth 2.0 does not specify token format
+  - No key management
+- OpenID Connect does!
+  - Discovery document (metadata)
+  - Public key(s)
+    - JWKS
+- API needs to fetch both to verify token
+  - URLs are based on the Issuer claim
+
+---
+## JWT Validation Algorithm
+
+### Steps
+
+1. Split the string
+2. Decode parts
+3. Parse JSON
+4. Fetch keys
+5. Verify signature
+6. Verify claims
+
+### Performance
+
+- Asynchronous: fetch keys
+- Synchronous: the rest
+
+---
+
+class: center, middle
+
+# Using JWT in ASP.NET Core
+### Demo
+
+---
+## JWT Performance
+
+- Significant impact
+- Fetching keys from the IdP
+  - 2 outbound HTTPS connections
+  - Backchannel HTTP request handler
+- Good news: ASP.NET Core already does caching
+- Caching options
+  - Automatic refresh interval (min. 5 minutes)
+  - Manual refresh interval (min. 1 second)
+  - Only configurable in .NET 5.0
+
+---
+
+class: center, middle
+
+# That's cool, but can we speed up or eliminate the CPU bound operations?
+
+---
+## Caching
+
+- Validating *the same token* twice likely gives *the same result*
+  - We can cache the entire token validation result
+- ASP.NET Core Authentication
+  - Authentication schemes
+  - Authentication handlers
+- Custom authentication handler
+  - Use in-memory cache
+  - Delegate JWT validation to built-in middleware
+- Viable strategy
+  - Typical client obtains a token and uses it as long as it can
+  - Tokens can be long lived
+  - There is a tradeoff between convenience + performance and security
+
+---
+
+class: center, middle
+
+# JWT Validation with Caching
+### Demo
+
+---
+## Caveats
+
+- This strategy works
+  - ... most of the time
+- Key rotation
+  - Purge tokens from the cache when keys are rotated
+  - ASP.NET Core metadata and key caching has to do it, too
+- Time-based claims
+  - iat, nbf, exp
+  - Need to be verified anyways, tokens eventually expire
+- Left as an exercise to the reader
+
+---
+## Summary
+
+- JWTs are well supported in ASP.NET Core
+  - Easy to integrate with existing identity providers
+- JWT validation is a mix of async and CPU bound operations
+- ASP.NET Core is smart about caching
+  - Out of the box metadata and key caching
+- More aggressive caching can eliminate CPU bound operations
+
+---
+class: center, middle
+### TODO: Call to Action
+
+    </textarea>
+    <script src="_General/Slides/remark.min.js" type="text/javascript"></script>
+    <script src="_General/Slides/main.js" type="text/javascript"></script>
+  </body>
+</html>
