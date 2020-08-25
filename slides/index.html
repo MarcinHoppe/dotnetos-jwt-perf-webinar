@@ -4,18 +4,28 @@
     <title>Improving JWT performance in ASP.NET Core</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="_General/Slides/style.css">
+    <style>
+      .banner {
+        background-image: url('images/poster_mh_-02.png');
+      }
+      .full-width {
+        background-size: auto 100%;
+      }
+      .full-height {
+        background-size: 100% auto;
+      }
+      .top-most {
+        background-position: top center;
+      }
+      li {
+        line-height: 150%;
+      }
+    </style>
   </head>
   <body>
     <textarea id="source">
 
-layout: true
-<div class="footer">Dotnetos - <a href="https://asyncexpert.com">asyncexpert.com</a></div>
-
----
-
-class: center, middle
-
-# Improving JWT performance in ASP.NET Core
+class: banner, full-height, top-most
 
 ---
 ## Agenda
@@ -31,12 +41,12 @@ class: center, middle
 - Client wants to call API
 - API needs to authenticate the client
 - Introduce a trusted third party
-  - Identity provider (IdP)
+  - Authorization server or identity provider (IdP)
   - Typical suspects: Auth0, Azure AD, Identity Server
 - Client obtains a token from the IdP
 - Client calls the API with the token
 - API verifies the token
-  - *This is our focus for today*
+  - **This is our focus for today**
 - Two dominant protocols
   - OAuth 2.0
   - OpenID Connect
@@ -56,17 +66,13 @@ class: center, middle
   - Subject
   - Other: expiration, issued at, etc.
 - Format
+  - `Header` . `Payload` . `Signature`
   - JSON
-    - Header
-    - Payload
-  - Signature or MAC code
   - Base64url encoding
-  - Concatenated by "."
 - JWE: ensure confidentiality
 - JWS: ensure integrity and non-repudiation
   - HMAC: shared secrets
-  - Signatures: public key cryptography (RSA, etc.)
-  - *Dominant use case*
+  - **Signatures: public key cryptography (RSA, etc.)**
 
 ---
 ## Sample JWT
@@ -90,8 +96,7 @@ GcORtsK0avNJHexn0fcYCnf9j1Ley2mxz2K24PMwefmcVuwiXzQd9VpjvE6yPGruU2ByerptMM5m4oGS
   - No key management
 - OpenID Connect does!
   - Discovery document (metadata)
-  - Public key(s)
-    - JWKS
+  - JSON Web Key Set (JWKS)
 - API needs to fetch both to verify token
   - URLs are based on the Issuer claim
 
@@ -100,12 +105,13 @@ GcORtsK0avNJHexn0fcYCnf9j1Ley2mxz2K24PMwefmcVuwiXzQd9VpjvE6yPGruU2ByerptMM5m4oGS
 
 ### Steps
 
-1. Split the string
+1. Split the string (.)
 2. Decode parts
 3. Parse JSON
-4. Fetch keys
-5. Verify signature
-6. Verify claims
+4. Read header and claims
+5. Fetch keys
+6. Verify signature
+7. Verify claims
 
 ### Performance
 
@@ -141,11 +147,11 @@ class: center, middle
 ---
 ## Caching
 
-- Validating *the same token* twice likely gives *the same result*
+- Validating **the same token** twice likely gives **the same result**
   - We can cache the entire token validation result
-- ASP.NET Core Authentication
-  - Authentication schemes
-  - Authentication handlers
+- ASP.NET Core Authentication building blocks
+  - Schemes
+  - Handlers
 - Custom authentication handler
   - Use in-memory cache
   - Delegate JWT validation to built-in middleware
@@ -186,7 +192,9 @@ class: center, middle
 
 ---
 class: center, middle
-### TODO: Call to Action
+
+# What do you want to know about security?
+### [The survey](https://dotnetos.typeform.com/to/J4cnbnoi)
 
     </textarea>
     <script src="_General/Slides/remark.min.js" type="text/javascript"></script>
