@@ -21,13 +21,6 @@ namespace Dotnetos
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddMemoryCache();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddCachingJwtBearer(options =>
-                {
-                    options.Authority = "https://marcin-auth0.auth0.com/";
-                    options.Audience = "https://dotnetos.org";
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,8 +32,6 @@ namespace Dotnetos
             }
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

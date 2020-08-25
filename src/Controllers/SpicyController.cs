@@ -8,7 +8,6 @@ namespace Dotnetos.Controllers
     public class SpicyController : ControllerBase
     {
         [HttpGet]
-        [Authorize]
         public string Get()
         {
             return "Hot!";
