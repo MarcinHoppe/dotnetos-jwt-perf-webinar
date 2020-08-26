@@ -20,6 +20,15 @@
       li {
         line-height: 150%;
       }
+      .left-column {
+        width: 50%;
+        height: 92%;
+        float: left;
+      }
+      .right-column {
+        width: 50%;
+        float: right;
+      }
     </style>
   </head>
   <body>
@@ -38,23 +47,26 @@ class: banner, full-height, top-most
 ---
 ## API Security
 
+.left-column[
 - Client wants to call API
 - API needs to authenticate the client
-- Introduce a trusted third party
-  - Authorization server or identity provider (IdP)
-  - Typical suspects: Auth0, Azure AD, Identity Server
+- Trusted third party
+  - Authorization server
+  - Identity provider (IdP)
+  - Examples: Auth0, Azure AD, IdentityServer
+- OAuth 2.0 and OpenID Connect
+
+### Flow
+
 - Client obtains a token from the IdP
 - Client calls the API with the token
 - API verifies the token
   - **This is our focus for today**
-- Two dominant protocols
-  - OAuth 2.0
-  - OpenID Connect
 
----
-## OpenID Connect
-
-### TODO: Grafika
+]
+.right-column[
+![diagram](images/api-security.png)
+]
 
 ---
 ## JSON Web Tokens (JWT)
@@ -68,9 +80,9 @@ class: banner, full-height, top-most
 - Format
   - `Header` . `Payload` . `Signature`
   - JSON
-  - Base64url encoding
-- JWE: ensure confidentiality
-- JWS: ensure integrity and non-repudiation
+  - Base64 encoding (URL-safe variant)
+- JSON Web Encryption: ensure payload confidentiality
+- JSON Web Signature: ensure token integrity
   - HMAC: shared secrets
   - **Signatures: public key cryptography (RSA, etc.)**
 
@@ -103,6 +115,7 @@ GcORtsK0avNJHexn0fcYCnf9j1Ley2mxz2K24PMwefmcVuwiXzQd9VpjvE6yPGruU2ByerptMM5m4oGS
 ---
 ## JWT Validation Algorithm
 
+.left-column[
 ### Steps
 
 1. Split the string (.)
@@ -112,11 +125,14 @@ GcORtsK0avNJHexn0fcYCnf9j1Ley2mxz2K24PMwefmcVuwiXzQd9VpjvE6yPGruU2ByerptMM5m4oGS
 5. Fetch keys
 6. Verify signature
 7. Verify claims
+]
 
+.right-column[
 ### Performance
 
 - Asynchronous: fetch keys
 - Synchronous: the rest
+]
 
 ---
 
